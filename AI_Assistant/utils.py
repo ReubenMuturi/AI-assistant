@@ -60,8 +60,8 @@ def execute_command(user_input):
 
 def search_internet(query):
     """Search the internet using the Google Custom Search API and return a snippet."""
-    api_key = 'AIzaSyCFxiRhD_NYpN0mmG8JMTSs7xesEr7fE8Q'  # Replace with your actual API key
-    search_engine_id = '35f0a725a524944eb'  # Replace with your actual Search Engine ID
+    api_key = ''  # Replace with your actual API key
+    search_engine_id = ''  # Replace with your actual Search Engine ID
     search_url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={search_engine_id}&q={query}"
 
     try:
