@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-from utils import search_internet, append_learning_data
+from utils import search_internet, append_learning_data, get_ai_response
 # from utils import load_learning_data
-from assistant import get_ai_response  # Import the get_ai_response function
+# Import the get_ai_response function
 from adaptive_ai import AdaptiveAI  # Import the AdaptiveAI class
 
 app = Flask(__name__)
@@ -17,6 +17,9 @@ def ask():
     """Handle user input and return AI-generated responses or internet search results."""
     user_input = request.json.get('input', '').strip().lower()
 
+    if not user_input:
+        return jsonify({"error": "No input provided."}), 400  # Bad request
+
     # Check if the user input is enclosed in quotes for an internet search
     if user_input.startswith('"') and user_input.endswith('"'):
         query = user_input.strip('"')
@@ -25,12 +28,15 @@ def ask():
         # Get AI response from the learning data
         response = get_ai_response(user_input, data)
 
-    # Save new data only if the response is meaningful and user input is not empty
+    # Save new data only if the response is meaningful
     if response and len(response) > 10:
         append_learning_data(user_input, response, data)
 
-    # Return the JSON response
-    return jsonify({"response": response or "I'm sorry, I don't have an answer for that."})
+    # Log the response for debugging
+    print(response)
+
+    return jsonify({"entries": response or "I'm sorry, I couldn't understand that. Please rephrase your question."})
+
 
 @app.route('/speak', methods=['POST'])
 def speak():
@@ -38,7 +44,7 @@ def speak():
     user_input = request.json.get('input', '').strip().lower()
     response = get_ai_response(user_input, data)
     audio_file = ai.speak(response)  # Generate verbal response
-    return jsonify({"response": response, "audio_file": audio_file})
+    return jsonify({"entries": response, "audio_file": audio_file})
 
 @app.route('/define', methods=['POST'])
 def define():
